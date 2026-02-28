@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan Results — WebScanner{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-danger">Scan Results</h2>
+        <a href="{% url 'scan_url' %}" class="btn btn-primary">Scan Another URL</a>
+    </div>
+    <div class="mb-3"><small class="text-muted">The <strong>Parameter</strong> column shows the input name where the payload was injected. Evidence contains a response snippet or other strong indicator.</small></div>
+
+    {% if results.count == 0 %}
+        <div class="alert alert-info">No findings recorded for this target.</div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Target URL</th>
+                        <th>Vulnerability Type</th>
+                        <th>Payload Used</th>
+                        <th>Affected Page</th>
+                        <th>Is Vulnerable?</th>
+                        <th>Evidence</th>
+                        <th>Parameter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in results %}
+                    <tr>
+                        <td style="min-width:220px;">{{ res.target.url }}</td>
+                        <td>{{ res.vulnerability_type }}</td>
+                        <td style="max-width:220px; word-break:break-word;">{{ res.payload_used }}</td>
+                        <td style="max-width:220px; word-break:break-word;">{{ res.vulnerable_page }}</td>
+                        <td>
+                            {% if res.is_vulnerable %}
+                                <span class="badge bg-danger">YES</span>
+                            {% else %}
+                                <span class="badge bg-success">NO</span>
+                            {% endif %}
+                        </td>
+                        <td style="min-width:300px; max-width:420px;">
+                            <textarea class="form-control font-monospace" rows="4" readonly>{{ res.evidence }}</textarea>
+                        </td>
+                        <td style="min-width:180px; max-width:260px;">
+                            <input type="text" class="form-control" value="{{ res.response }}" readonly title="Parameter where payload was injected">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}
